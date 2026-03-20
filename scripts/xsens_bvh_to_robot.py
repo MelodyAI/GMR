@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--bvh_file",
         help="BVH motion file to load.",
-        # default="./xsens_bvh/xsens_walk.bvh",
+        # default="./input/xsens/zyd_test_holdgunmove.bvh",
         required=True,
         type=str,
     )
@@ -29,14 +29,18 @@ if __name__ == "__main__":
             "unitree_h1_2",
             "Q1",
             "X1",
+            "elf3",
         ],
-        default="unitree_h1_2",
+        # default="unitree_h1_2",
+        default="elf3",
+        # default="unitree_g1",
     )
 
     parser.add_argument(
         "--record_video",
         action="store_true",
-        default=False,
+        # default=False,
+        default=True,
     )
 
     parser.add_argument(
@@ -53,8 +57,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--save_path",
-        # default="./retargeting_data/unitree_h1_2_xsens_walk.pkl",
-        default=None,
+        default="/home/cheng/rl/GMR/outputs/xsens/output.pkl",
+        # default=None,
         help="Path to save the robot motion.",
     )
 

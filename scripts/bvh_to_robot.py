@@ -17,8 +17,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--bvh_file",
         help="BVH motion file to load.",
-        required=True,
+        # required=True,
+        required=False,
         type=str,
+        default="/home/cheng/rl/GMR/inputs/lafan1/walk3_subject4.bvh",
     )
     
     parser.add_argument(
@@ -36,8 +38,9 @@ if __name__ == "__main__":
     
     parser.add_argument(
         "--robot",
-        choices=["unitree_g1", "unitree_g1_with_hands", "booster_t1", "stanford_toddy", "fourier_n1", "engineai_pm01", "pal_talos"],
-        default="unitree_g1",
+        choices=["unitree_g1", "unitree_g1_with_hands", "booster_t1", "stanford_toddy", "fourier_n1", "engineai_pm01", "pal_talos", "elf2_dof25", "elf3"],
+        # default="unitree_g1",
+        default="elf3",
     )
     
     
@@ -61,7 +64,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--save_path",
-        default=None,
+        # default=None,
+        default="/home/cheng/rl/GMR/outputs/lafan1/output.pkl",
         help="Path to save the robot motion.",
     )
     
@@ -105,7 +109,8 @@ if __name__ == "__main__":
     # FPS measurement variables
     fps_counter = 0
     fps_start_time = time.time()
-    fps_display_interval = 2.0  # Display FPS every 2 seconds
+    fps_display_interval = 1.0  # Display FPS every 2 seconds
+    # fps_display_interval = 2.0  # Display FPS every 2 seconds 
     
     print(f"mocap_frame_rate: {motion_fps}")
     

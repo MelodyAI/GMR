@@ -21,7 +21,14 @@ if __name__ == "__main__":
         help="SMPLX motion file to load.",
         type=str,
         # required=True,
-        default="/home/yanjieze/projects/g1_wbc/GMR/GVHMR/outputs/demo/tennis/hmr4d_results.pt",
+        #default="/home/cheng/rl/GVHMR/outputs/demo/tennis/hmr4d_results.pt",
+        # default="/home/cheng/rl/GVHMR/outputs/demo/jojo/hmr4d_results.pt",
+        # default="/home/cheng/rl/GVHMR/outputs/demo/ydd/hmr4d_results.pt",
+        # default="/home/cheng/rl/GVHMR/outputs/demo/jntm/hmr4d_results.pt",
+        # default="/home/cheng/rl/GVHMR/outputs/demo/gait/hmr4d_results.pt",
+        # default="/home/cheng/rl/GVHMR/outputs/demo/fall_back/hmr4d_results.pt",
+        # default="/home/cheng/rl/GVHMR/outputs/demo/getup_back/hmr4d_results.pt",
+        default="/home/cheng/rl/GVHMR/outputs/demo/getup_face/hmr4d_results.pt",
     )
     
     parser.add_argument(
@@ -29,26 +36,30 @@ if __name__ == "__main__":
         choices=["unitree_g1", "unitree_g1_with_hands", "unitree_h1", "unitree_h1_2",
                  "booster_t1", "booster_t1_29dof","stanford_toddy", "fourier_n1", 
                 "engineai_pm01", "kuavo_s45", "hightorque_hi", "galaxea_r1pro", "berkeley_humanoid_lite", "booster_k1",
-                "pnd_adam_lite", "openloong", "tienkung"],
-        default="unitree_g1",
+                "pnd_adam_lite", "openloong", "tienkung", "elf2_dof25", "elf3"],
+        #default="unitree_g1",
+        default="elf3",
     )
     
     parser.add_argument(
         "--save_path",
-        default=None,
+        #default=None,
+        default="/home/cheng/rl/GMR/outputs/gvhmr/output.pkl",
         help="Path to save the robot motion.",
     )
     
     parser.add_argument(
         "--loop",
         default=False,
+        # default=True,
         action="store_true",
         help="Loop the motion.",
     )
 
     parser.add_argument(
         "--record_video",
-        default=False,
+        #default=False,
+        default=True,
         action="store_true",
         help="Record the video.",
     )
@@ -56,6 +67,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--rate_limit",
         default=False,
+        #default=60,
         action="store_true",
         help="Limit the rate of the retargeted robot motion to keep the same as the human motion.",
     )

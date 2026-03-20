@@ -21,11 +21,28 @@ if __name__ == "__main__":
         help="SMPLX motion file to load.",
         type=str,
         # required=True,
-        default="/home/yanjieze/projects/g1_wbc/GMR/motion_data/ACCAD/Male1General_c3d/General_A1_-_Stand_stageii.npz",
+        # default="/home/yanjieze/projects/g1_wbc/GMR/motion_data/ACCAD/Male1General_c3d/General_A1_-_Stand_stageii.npz",
         # default="/home/yanjieze/projects/g1_wbc/GMR/motion_data/ACCAD/Male2MartialArtsKicks_c3d/G8_-__roundhouse_left_stageii.npz"
         # default="/home/yanjieze/projects/g1_wbc/TWIST-dev/motion_data/AMASS/KIT_572_dance_chacha11_stageii.npz"
         # default="/home/yanjieze/projects/g1_wbc/GMR/motion_data/ACCAD/Male2MartialArtsPunches_c3d/E1_-__Jab_left_stageii.npz",
         # default="/home/yanjieze/projects/g1_wbc/GMR/motion_data/ACCAD/Male1Running_c3d/Run_C24_-_quick_side_step_left_stageii.npz",
+        # default="inputs/ACCAD/Female1General_c3d/A1_-_Stand_stageii.npz",
+        # default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
+        # default="inputs/ACCAD/Male1Walking_c3d/Male1_Cal_stageii.npz",
+        
+        # default="inputs/ACCAD/Male2General_c3d/A1-_Stand_stageii.npz",
+        # default="inputs/ACCAD/Male2Walking_c3d/B4_-_Stand_to_Walk_backwards_stageii.npz",
+        # default="inputs/ACCAD/Male2Walking_c3d/B9_-__Walk_turn_left_90_stageii.npz",
+        # default="inputs/ACCAD/Male2Walking_c3d/B13_-__Walk_turn_right_90_stageii.npz",
+        # default="inputs/ACCAD/Male2Walking_c3d/B15_-__Walk_turn_around_stageii.npz",
+        # default="inputs/ACCAD/Male2Running_c3d/C5_-_walk_to_run_stageii.npz",
+        
+        # default="inputs/ACCAD/Male2Running_c3d/C4_-_run_to_walk_a_stageii.npz",
+        default="inputs/ACCAD/Male2Running_c3d/C1_-_stand_to_run_stageii.npz",
+        
+        default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
+        default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
+        default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
     )
     
     parser.add_argument(
@@ -33,13 +50,14 @@ if __name__ == "__main__":
         choices=["unitree_g1", "unitree_g1_with_hands", "unitree_h1", "unitree_h1_2",
                  "booster_t1", "booster_t1_29dof","stanford_toddy", "fourier_n1", 
                 "engineai_pm01", "kuavo_s45", "hightorque_hi", "galaxea_r1pro", "berkeley_humanoid_lite", "booster_k1",
-                "pnd_adam_lite", "openloong", "tienkung", "fourier_gr3"],
-        default="unitree_g1",
+                "pnd_adam_lite", "openloong", "tienkung", "elf2_dof25", "elf3"],
+        default="elf3",
     )
     
     parser.add_argument(
         "--save_path",
-        default=None,
+        # default=None,
+        default="/home/cheng/rl/GMR/outputs/smplx/output.pkl",
         help="Path to save the robot motion.",
     )
     

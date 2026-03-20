@@ -19,7 +19,8 @@ def keyboard_callback(keycode):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--robot", type=str, default="unitree_g1")
+    # parser.add_argument("--robot", type=str, default="unitree_g1")
+    parser.add_argument("--robot", type=str, default="elf3")
                         
     parser.add_argument("--robot_motion_folder", type=str, required=True)
 
