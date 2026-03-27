@@ -28,7 +28,7 @@ if __name__ == "__main__":
         # default="/home/cheng/rl/GVHMR/outputs/demo/gait/hmr4d_results.pt",
         # default="/home/cheng/rl/GVHMR/outputs/demo/fall_back/hmr4d_results.pt",
         # default="/home/cheng/rl/GVHMR/outputs/demo/getup_back/hmr4d_results.pt",
-        default="/home/cheng/rl/GVHMR/outputs/demo/getup_face/hmr4d_results.pt",
+        default="/home/cheng/rl/GVHMR/outputs/demo/run/hmr4d_results.pt",
     )
     
     parser.add_argument(
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--save_path",
         #default=None,
-        default="/home/cheng/rl/GMR/outputs/gvhmr/output.pkl",
+        default="/home/cheng/my_fork/GMR/outputs/gvhmr/output.pkl",
         help="Path to save the robot motion.",
     )
     
@@ -67,9 +67,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "--rate_limit",
         default=False,
-        #default=60,
+        # default=60,
         action="store_true",
         help="Limit the rate of the retargeted robot motion to keep the same as the human motion.",
+    )
+
+    parser.add_argument(
+        "--no_smooth_root",
+        # default=False,
+        default=True,
+        action="store_true",
+        help="Disable root trajectory smoothing. By default GVHMR root_pos is smoothed to reduce jitter (especially height axis).",
     )
 
     args = parser.parse_args()
@@ -78,13 +86,14 @@ if __name__ == "__main__":
     SMPLX_FOLDER = HERE / ".." / "assets" / "body_models"
     
     
-    # Load SMPLX trajectory
+    # Load SMPLX trajectory (smooth root by default to fix GVHMR height jitter)
     smplx_data, body_model, smplx_output, actual_human_height = load_gvhmr_pred_file(
-        args.gvhmr_pred_file, SMPLX_FOLDER
+        args.gvhmr_pred_file, SMPLX_FOLDER, smooth_root=not args.no_smooth_root
     )
     
     # align fps
-    tgt_fps = 30
+    # tgt_fps = 30
+    tgt_fps = 60
     smplx_data_frames, aligned_fps = get_gvhmr_data_offline_fast(smplx_data, body_model, smplx_output, tgt_fps=tgt_fps)
     
     

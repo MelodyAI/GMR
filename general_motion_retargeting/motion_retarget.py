@@ -79,6 +79,14 @@ class GeneralMotionRetargeting:
         self.use_ik_match_table2 = ik_config["use_ik_match_table2"]
         self.human_scale_table = ik_config["human_scale_table"]
         self.ground = ik_config["ground_height"] * np.array([0, 0, 1])
+        
+        # Root horizontal scale: controls XY displacement scaling independently from
+        # the pelvis height scale. Default 1.0 means horizontal displacement is not 
+        # scaled down, which prevents foot sliding when the robot is shorter than human.
+        # Can be overridden in IK config via "root_horizontal_scale".
+        self.root_horizontal_scale = ik_config.get("root_horizontal_scale", 1.0)
+        if actual_human_height is not None:
+            self.root_horizontal_scale *= ratio
 
         self.max_iter = 10
 
@@ -245,8 +253,18 @@ class GeneralMotionRetargeting:
         human_data_local = {}
         root_pos, root_quat = human_data[human_root_name]
         
-        # scale root
-        scaled_root_pos = human_scale_table[human_root_name] * root_pos
+        # scale root position
+        # The pelvis scale is designed for height matching (vertical axis),
+        # but applying the same scale to horizontal displacement causes foot sliding
+        # when the robot is shorter than the human, because the root moves slower
+        # while the legs still animate at full stride.
+        # Solution: use root_horizontal_scale (default 1.0) for XY, pelvis scale for Z.
+        root_scale = human_scale_table[human_root_name]
+        horizontal_scale = self.root_horizontal_scale
+        scaled_root_pos = root_pos.copy()
+        scaled_root_pos[0] *= horizontal_scale  # X
+        scaled_root_pos[1] *= horizontal_scale  # Y
+        scaled_root_pos[2] *= root_scale         # Z (height)
         
         # scale other body parts in local frame
         for body_name in human_data.keys():

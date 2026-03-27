@@ -4,8 +4,101 @@ import torch
 from scipy.spatial.transform import Rotation as R
 from smplx.joint_names import JOINT_NAMES
 from scipy.interpolate import interp1d
+from scipy.signal import butter, filtfilt
 
 import general_motion_retargeting.utils.lafan_vendor.utils as utils
+
+
+def smooth_gvhmr_root_trajectory(transl, global_orient, fps=30.0,
+                                  height_cutoff=2.0, xz_cutoff=1.0,
+                                  use_foot_grounding=True,
+                                  joints_3d=None):
+    """
+    Post-process GVHMR root translation to reduce jitter and drift.
+    
+    GVHMR's global translation (especially the height/Y axis) tends to be noisy
+    because it's estimated from monocular video via global trajectory optimization.
+    The height axis often has both high-frequency jitter AND low-frequency drift
+    (e.g. height changing from 1.3m to 3.7m over a running sequence).
+    
+    This function applies:
+    1. Butterworth low-pass filtering to remove high-frequency jitter
+    2. Foot-contact-based per-frame ground calibration to remove height drift
+    3. Optional light smoothing on XZ axes
+    
+    Args:
+        transl: (N, 3) global translation array
+        global_orient: (N, 3) global orientation (axis-angle) array
+        fps: frames per second
+        height_cutoff: cutoff frequency for height axis low-pass filter (Hz)
+        xz_cutoff: cutoff frequency for XZ axes low-pass filter (Hz), 0 to disable
+        use_foot_grounding: whether to apply foot grounding correction
+        joints_3d: (N, J, 3) joint positions from SMPL forward kinematics (optional,
+                   used for foot contact detection)
+    
+    Returns:
+        smoothed_transl: (N, 3) smoothed translation array
+    """
+    smoothed = transl.copy()
+    N = len(transl)
+    
+    if N < 10:
+        return smoothed
+    
+    nyquist = fps / 2.0
+    
+    # 1. Smooth the height (Y) axis with low-pass filter to remove jitter
+    if height_cutoff > 0 and height_cutoff < nyquist:
+        b, a = butter(2, height_cutoff / nyquist, btype='low')
+        smoothed[:, 1] = filtfilt(b, a, transl[:, 1])
+    
+    # 2. Optionally smooth XZ axes
+    if xz_cutoff > 0 and xz_cutoff < nyquist:
+        b, a = butter(2, xz_cutoff / nyquist, btype='low')
+        smoothed[:, 0] = filtfilt(b, a, transl[:, 0])
+        smoothed[:, 2] = filtfilt(b, a, transl[:, 2])
+    
+    # 3. Foot-contact-based ground calibration to fix height drift
+    #    The key idea: the lowest foot height at each frame provides a noisy estimate
+    #    of the ground plane. We smooth this estimate and subtract it, keeping only
+    #    the relative height of the root above ground. This fixes low-frequency drift
+    #    that low-pass filtering alone cannot handle.
+    if use_foot_grounding and joints_3d is not None:
+        # SMPLX joint indices: 7=left_ankle, 8=right_ankle, 10=left_foot, 11=right_foot
+        foot_indices = [7, 8, 10, 11]
+        foot_positions = joints_3d[:, foot_indices, :]  # (N, 4, 3)
+        
+        # Compute foot velocities to detect contacts
+        foot_vel = np.diff(foot_positions, axis=0) * fps  # (N-1, 4, 3)
+        foot_speed = np.linalg.norm(foot_vel, axis=-1)   # (N-1, 4)
+        
+        # Minimum foot height at each frame (proxy for ground level)
+        min_foot_height = foot_positions[:, :, 1].min(axis=1)  # (N,)
+        
+        # Root-to-ground offset at each frame
+        root_above_ground = smoothed[:, 1] - min_foot_height  # (N,)
+        
+        # Smooth the root-above-ground offset (this preserves natural bounce)
+        b_h, a_h = butter(2, min(height_cutoff, nyquist - 0.1) / nyquist, btype='low')
+        root_above_ground_smooth = filtfilt(b_h, a_h, root_above_ground)
+        
+        # Estimate ground height at first frame from contact analysis
+        contact_threshold = 0.8  # m/s
+        is_contact = np.zeros(N, dtype=bool)
+        is_contact[1:] = np.any(foot_speed < contact_threshold, axis=1)
+        is_contact[0] = is_contact[1]
+        
+        if np.sum(is_contact) > 3:
+            # Ground level = median of lowest foot heights at contact frames
+            ground_ref = np.percentile(min_foot_height[is_contact], 10)
+        else:
+            # Fallback: use the overall minimum foot height
+            ground_ref = np.percentile(min_foot_height, 10)
+        
+        # Reconstruct height: ground_ref + smoothed root-above-ground offset
+        smoothed[:, 1] = ground_ref + root_above_ground_smooth
+    
+    return smoothed
 
 def load_smpl_file(smpl_file):
     smpl_data = np.load(smpl_file, allow_pickle=True)
@@ -47,7 +140,7 @@ def load_smplx_file(smplx_file, smplx_body_model_path):
     return smplx_data, body_model, smplx_output, human_height
 
 
-def load_gvhmr_pred_file(gvhmr_pred_file, smplx_body_model_path):
+def load_gvhmr_pred_file(gvhmr_pred_file, smplx_body_model_path, smooth_root=True):
     gvhmr_pred = torch.load(gvhmr_pred_file)
     smpl_params_global = gvhmr_pred['smpl_params_global']
     # print(smpl_params_global['body_pose'].shape)
@@ -57,18 +150,14 @@ def load_gvhmr_pred_file(gvhmr_pred_file, smplx_body_model_path):
     
     betas = np.pad(smpl_params_global['betas'][0], (0,6))
     
-    # correct rotations
-    # rotation_matrix = np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
-    # rotation_quat = R.from_matrix(rotation_matrix).as_quat(scalar_first=True)
-    
-    # smpl_params_global['body_pose'] = smpl_params_global['body_pose'] @ rotation_matrix
-    # smpl_params_global['global_orient'] = smpl_params_global['global_orient'] @ rotation_quat
+    transl_np = smpl_params_global['transl'].numpy()
+    global_orient_np = smpl_params_global['global_orient'].numpy()
     
     smplx_data = {
         'pose_body': smpl_params_global['body_pose'].numpy(),
         'betas': betas,
-        'root_orient': smpl_params_global['global_orient'].numpy(),
-        'trans': smpl_params_global['transl'].numpy(),
+        'root_orient': global_orient_np,
+        'trans': transl_np,
         "mocap_frame_rate": torch.tensor(30),
     }
 
@@ -93,6 +182,32 @@ def load_gvhmr_pred_file(gvhmr_pred_file, smplx_body_model_path):
         # expression=torch.zeros(num_frames, 10).float(),
         return_full_pose=True,
     )
+    
+    # Smooth the GVHMR root trajectory (height axis is especially noisy)
+    if smooth_root:
+        joints_3d = smplx_output.joints.detach().numpy()
+        smoothed_transl = smooth_gvhmr_root_trajectory(
+            transl_np, global_orient_np,
+            fps=30.0,
+            height_cutoff=2.0,  # aggressive smoothing on height
+            xz_cutoff=1.0,      # light smoothing on XZ
+            use_foot_grounding=True,
+            joints_3d=joints_3d,
+        )
+        # Update both smplx_data and re-run forward kinematics with smoothed transl
+        smplx_data['trans'] = smoothed_transl
+        smplx_output = body_model(
+            betas=torch.tensor(smplx_data["betas"]).float().view(1, -1),
+            global_orient=torch.tensor(smplx_data["root_orient"]).float(),
+            body_pose=torch.tensor(smplx_data["pose_body"]).float(),
+            transl=torch.tensor(smoothed_transl).float(),
+            left_hand_pose=torch.zeros(num_frames, 45).float(),
+            right_hand_pose=torch.zeros(num_frames, 45).float(),
+            jaw_pose=torch.zeros(num_frames, 3).float(),
+            leye_pose=torch.zeros(num_frames, 3).float(),
+            reye_pose=torch.zeros(num_frames, 3).float(),
+            return_full_pose=True,
+        )
     
     if len(smplx_data['betas'].shape)==1:
         human_height = 1.66 + 0.1 * smplx_data['betas'][0]
