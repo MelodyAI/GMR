@@ -61,6 +61,7 @@ IK_CONFIG_DICT = {
     },
     "bvh_nokov":{
         "unitree_g1": IK_CONFIG_ROOT / "bvh_nokov_to_g1.json",
+        "elf3": IK_CONFIG_ROOT / "bvh_nokov_to_elf3.json",
     },
     "bvh_xsens":{
         "unitree_g1": IK_CONFIG_ROOT / "bvh_xsens_to_g1.json",

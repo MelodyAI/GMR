@@ -32,8 +32,8 @@ if __name__ == "__main__":
             "elf3",
         ],
         # default="unitree_h1_2",
-        default="elf3",
-        # default="unitree_g1",
+        # default="elf3",
+        default="unitree_g1",
     )
 
     parser.add_argument(
@@ -57,7 +57,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--save_path",
-        default="/home/cheng/rl/GMR/outputs/xsens/output.pkl",
+        # default="/home/cheng/rl/GMR/outputs/xsens/output.pkl",
+        default="outputs/xsens/output.pkl",
         # default=None,
         help="Path to save the robot motion.",
     )

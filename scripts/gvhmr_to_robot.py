@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--save_path",
         #default=None,
-        default="/home/cheng/my_fork/GMR/outputs/gvhmr/output.pkl",
+        default="outputs/gvhmr/output.pkl",
         help="Path to save the robot motion.",
     )
     

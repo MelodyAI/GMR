@@ -20,13 +20,15 @@ if __name__ == "__main__":
         # required=True,
         required=False,
         type=str,
-        default="/home/cheng/rl/GMR/inputs/lafan1/walk3_subject4.bvh",
+        # default="/home/cheng/rl/GMR/inputs/lafan1/walk3_subject4.bvh",
+        default="inputs/nokov/backflip.bvh",
     )
     
     parser.add_argument(
         "--format",
         choices=["lafan1", "nokov"],
-        default="lafan1",
+        # default="lafan1",
+        default="nokov",
     )
     
     parser.add_argument(
@@ -47,7 +49,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--record_video",
         action="store_true",
-        default=False,
+        # default=False,
+        default=True,
     )
 
     parser.add_argument(
@@ -65,13 +68,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--save_path",
         # default=None,
-        default="/home/cheng/rl/GMR/outputs/lafan1/output.pkl",
+        # default="outputs/lafan1/output.pkl",
+        default="outputs/nokov/output.pkl",
         help="Path to save the robot motion.",
     )
     
     parser.add_argument(
         "--motion_fps",
-        default=30,
+        # default=30,
+        # default=60,
+        default=120,
         type=int,
     )
     
@@ -109,7 +115,7 @@ if __name__ == "__main__":
     # FPS measurement variables
     fps_counter = 0
     fps_start_time = time.time()
-    fps_display_interval = 1.0  # Display FPS every 2 seconds
+    fps_display_interval = 1.0  # Display FPS every 1 seconds
     # fps_display_interval = 2.0  # Display FPS every 2 seconds 
     
     print(f"mocap_frame_rate: {motion_fps}")

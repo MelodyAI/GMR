@@ -40,9 +40,9 @@ if __name__ == "__main__":
         # default="inputs/ACCAD/Male2Running_c3d/C4_-_run_to_walk_a_stageii.npz",
         default="inputs/ACCAD/Male2Running_c3d/C1_-_stand_to_run_stageii.npz",
         
-        default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
-        default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
-        default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
+        # default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
+        # default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
+        # default="inputs/ACCAD/Female1Running_c3d/C5_-_walk_to_run_stageii.npz",
     )
     
     parser.add_argument(
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--save_path",
         # default=None,
-        default="/home/cheng/rl/GMR/outputs/smplx/output.pkl",
+        default="outputs/smplx/output.pkl",
         help="Path to save the robot motion.",
     )
     
@@ -70,7 +70,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--record_video",
-        default=False,
+        # default=False,
+        default=True,
         action="store_true",
         help="Record the video.",
     )
