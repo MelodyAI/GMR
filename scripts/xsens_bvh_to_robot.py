@@ -32,8 +32,8 @@ if __name__ == "__main__":
             "elf3",
         ],
         # default="unitree_h1_2",
-        # default="elf3",
-        default="unitree_g1",
+        default="elf3",
+        # default="unitree_g1",
     )
 
     parser.add_argument(
