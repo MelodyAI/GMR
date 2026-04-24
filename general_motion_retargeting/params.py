@@ -47,7 +47,8 @@ IK_CONFIG_DICT = {
         "tienkung": IK_CONFIG_ROOT / "smplx_to_tienkung.json",
         "fourier_gr3": IK_CONFIG_ROOT / "smplx_to_gr3.json",
         # "elf3": IK_CONFIG_ROOT / "smplx_to_elf3_female.json",
-        "elf3": IK_CONFIG_ROOT / "smplx_to_elf3_male.json",
+        #"elf3": IK_CONFIG_ROOT / "smplx_to_elf3_male.json",
+        "elf3": IK_CONFIG_ROOT / "smplx_to_elf3.json",
     },
     "bvh_lafan1":{
         "unitree_g1": IK_CONFIG_ROOT / "bvh_lafan1_to_g1.json",
@@ -67,21 +68,24 @@ IK_CONFIG_DICT = {
         "unitree_g1": IK_CONFIG_ROOT / "bvh_xsens_to_g1.json",
         "unitree_h1_2": IK_CONFIG_ROOT / "bvh_xsens_to_h1_2.json",
         "elf3": IK_CONFIG_ROOT / "bvh_xsens_to_elf3.json",
-        # "elf3": IK_CONFIG_ROOT / "bvh_xsens_to_elf3_bad.json",
     },
     "fbx":{
         "unitree_g1": IK_CONFIG_ROOT / "fbx_to_g1.json",
         "unitree_g1_with_hands": IK_CONFIG_ROOT / "fbx_to_g1.json",
+        "elf3": IK_CONFIG_ROOT / "fbx_to_elf3.json",
     },
     "fbx_offline":{
         "unitree_g1": IK_CONFIG_ROOT / "fbx_offline_to_g1.json",
+        "elf3": IK_CONFIG_ROOT / "fbx_offline_to_elf3.json",
     },
     
     "xrobot":{
         "unitree_g1": IK_CONFIG_ROOT / "xrobot_to_g1.json",
+        "elf3": IK_CONFIG_ROOT / "xrobot_to_elf3.json",
     },
     "xsens_mvn": {
         "unitree_g1": IK_CONFIG_ROOT / "xsens_mvn_to_g1.json",
+        "elf3": IK_CONFIG_ROOT / "xsens_mvn_to_elf3.json",
     },
 }
 
