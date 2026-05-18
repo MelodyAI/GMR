@@ -69,6 +69,10 @@ IK_CONFIG_DICT = {
         "unitree_h1_2": IK_CONFIG_ROOT / "bvh_xsens_to_h1_2.json",
         "elf3": IK_CONFIG_ROOT / "bvh_xsens_to_elf3.json",
     },
+    "bvh_soma":{
+        "unitree_g1": IK_CONFIG_ROOT / "bvh_soma_to_g1.json",
+        "elf3": IK_CONFIG_ROOT / "bvh_soma_to_elf3.json",
+    },
     "fbx":{
         "unitree_g1": IK_CONFIG_ROOT / "fbx_to_g1.json",
         "unitree_g1_with_hands": IK_CONFIG_ROOT / "fbx_to_g1.json",

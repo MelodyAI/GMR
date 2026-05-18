@@ -191,7 +191,9 @@ if __name__ == "__main__":
         import pickle
 
         root_pos = np.array([qpos[:3] for qpos in qpos_list])
-        root_rot = np.array([qpos[3:7] for qpos in qpos_list])
+        root_rot_wxyz = np.array([qpos[3:7] for qpos in qpos_list])
+        # Convert from MuJoCo wxyz to xyzw format for storage
+        root_rot = root_rot_wxyz[:, [1, 2, 3, 0]]
         dof_pos = np.array([qpos[7:] for qpos in qpos_list])
         local_body_pos = None
         body_names = None
