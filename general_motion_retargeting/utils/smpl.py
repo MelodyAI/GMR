@@ -104,8 +104,40 @@ def load_smpl_file(smpl_file):
     smpl_data = np.load(smpl_file, allow_pickle=True)
     return smpl_data
 
+def _normalize_amass_smplx_data(smplx_data):
+    """Return a dict with the SMPL-X fields expected by GMR.
+
+    AMASS SMPL-X stage files expose ``pose_body`` / ``root_orient`` directly,
+    while older AMASS pose files often only expose a packed ``poses`` array:
+    root orientation (3), body pose (63), and optional hand pose (90).
+    """
+    data = {key: smplx_data[key] for key in smplx_data.files}
+
+    if "mocap_frame_rate" not in data and "mocap_framerate" in data:
+        data["mocap_frame_rate"] = data["mocap_framerate"]
+
+    if ("pose_body" not in data or "root_orient" not in data) and "poses" in data:
+        poses = data["poses"]
+        if poses.ndim != 2 or poses.shape[1] < 66:
+            raise ValueError(
+                "AMASS poses array must have shape (N, >=66) to extract "
+                "root_orient and pose_body."
+            )
+        data["root_orient"] = poses[:, :3]
+        data["pose_body"] = poses[:, 3:66]
+
+    required_keys = ["pose_body", "root_orient", "trans", "betas", "gender", "mocap_frame_rate"]
+    missing_keys = [key for key in required_keys if key not in data]
+    if missing_keys:
+        raise KeyError(
+            f"Unsupported SMPL-X/AMASS file. Missing keys: {missing_keys}. "
+            "Expected either SMPL-X stage fields or packed AMASS poses fields."
+        )
+
+    return data
+
 def load_smplx_file(smplx_file, smplx_body_model_path):
-    smplx_data = np.load(smplx_file, allow_pickle=True)
+    smplx_data = _normalize_amass_smplx_data(np.load(smplx_file, allow_pickle=True))
     body_model = smplx.create(
         smplx_body_model_path,
         "smplx",

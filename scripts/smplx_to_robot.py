@@ -82,6 +82,20 @@ if __name__ == "__main__":
         action="store_true",
         help="Limit the rate of the retargeted robot motion to keep the same as the human motion.",
     )
+    
+    parser.add_argument(
+        "--no_offset_to_ground",
+        default=False,
+        action="store_true",
+        help="Disable per-frame SMPL-X foot grounding before retargeting.",
+    )
+    
+    parser.add_argument(
+        "--ground_clearance",
+        default=0.058,
+        type=float,
+        help="Target human foot clearance in meters when SMPL-X foot grounding is enabled.",
+    )
 
     args = parser.parse_args()
 
@@ -149,7 +163,11 @@ if __name__ == "__main__":
         smplx_data = smplx_data_frames[i]
 
         # retarget
-        qpos = retarget.retarget(smplx_data)
+        qpos = retarget.retarget(
+            smplx_data,
+            offset_to_ground=not args.no_offset_to_ground,
+            ground_clearance=args.ground_clearance,
+        )
 
         # visualize
         robot_motion_viewer.step(

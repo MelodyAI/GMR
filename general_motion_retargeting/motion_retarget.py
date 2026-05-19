@@ -155,14 +155,14 @@ class GeneralMotionRetargeting:
                 self.task_errors2[task] = []
 
   
-    def update_targets(self, human_data, offset_to_ground=False):
+    def update_targets(self, human_data, offset_to_ground=False, ground_clearance=0.1):
         # scale human data in local frame
         human_data = self.to_numpy(human_data)
         human_data = self.scale_human_data(human_data, self.human_root_name, self.human_scale_table)
         human_data = self.offset_human_data(human_data, self.pos_offsets1, self.rot_offsets1)
         human_data = self.apply_ground_offset(human_data)
         if offset_to_ground:
-            human_data = self.offset_human_data_to_ground(human_data)
+            human_data = self.offset_human_data_to_ground(human_data, ground_clearance)
         self.scaled_human_data = human_data
 
         if self.use_ik_match_table1:
@@ -178,9 +178,9 @@ class GeneralMotionRetargeting:
                 task.set_target(mink.SE3.from_rotation_and_translation(mink.SO3(rot), pos))
             
             
-    def retarget(self, human_data, offset_to_ground=False):
+    def retarget(self, human_data, offset_to_ground=False, ground_clearance=0.1):
         # Update the task targets
-        self.update_targets(human_data, offset_to_ground)
+        self.update_targets(human_data, offset_to_ground, ground_clearance)
 
         if self.use_ik_match_table1:
             # Solve the IK problem
@@ -301,10 +301,9 @@ class GeneralMotionRetargeting:
            
         return offset_human_data
             
-    def offset_human_data_to_ground(self, human_data):
+    def offset_human_data_to_ground(self, human_data, ground_offset=0.1):
         """find the lowest point of the human data and offset the human data to the ground"""
         offset_human_data = {}
-        ground_offset = 0.1
         lowest_pos = np.inf
 
         for body_name in human_data.keys():
